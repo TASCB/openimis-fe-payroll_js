@@ -44,6 +44,8 @@
     "dist"
   ],
   "dependencies": {
+    "jspdf": "^4.2.0",
+    "jspdf-autotable": "^5.0.7",
     "react-to-print": "^2.15.1"
   }
 }

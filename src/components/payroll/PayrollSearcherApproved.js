@@ -19,6 +19,35 @@ import { fetchPayrolls } from '../../actions';
 import PaymentApproveForPaymentSummary from './dialogs/PaymentApproveForPaymentSummary';
 import PayrollReconciliationFilesDialog from './dialogs/PayrollReconciliationFilesDialog';
 
+const resolveBenefitPlan = (payroll) => {
+  if (payroll?.benefitPlan) {
+    return payroll.benefitPlan;
+  }
+
+  const benefitPlanValue = payroll?.paymentPlan?.benefitPlan;
+  if (!benefitPlanValue) {
+    return null;
+  }
+
+  if (typeof benefitPlanValue === 'object') {
+    return benefitPlanValue;
+  }
+
+  if (typeof benefitPlanValue === 'string') {
+    try {
+      const parsed = JSON.parse(benefitPlanValue);
+      if (typeof parsed === 'string') {
+        return JSON.parse(parsed);
+      }
+      return parsed;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  return null;
+};
+
 function PayrollSearcherApproved({
   fetchingPayrolls,
   fetchedPayrolls,
@@ -86,8 +115,10 @@ function PayrollSearcherApproved({
 
   const itemFormatters = () => [
     (payroll) => payroll.name,
-    (payroll) => (payroll.benefitPlan
-      ? `${payroll.benefitPlan.code} ${payroll.benefitPlan.name}` : ''),
+    (payroll) => {
+      const benefitPlan = resolveBenefitPlan(payroll);
+      return benefitPlan ? `${benefitPlan.code} ${benefitPlan.name}` : '';
+    },
     (payroll) => (payroll.paymentPoint
       ? `${payroll.paymentPoint.name}` : ''),
     (payroll) => (payroll.status

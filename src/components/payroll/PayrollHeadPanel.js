@@ -25,6 +25,33 @@ const styles = (theme) => ({
 });
 
 class PayrollHeadPanel extends FormPanel {
+  resolveBenefitPlanId(benefitPlanValue) {
+    if (!benefitPlanValue) return null;
+
+    if (typeof benefitPlanValue === 'object') {
+      return benefitPlanValue.id || benefitPlanValue.uuid || null;
+    }
+
+    if (typeof benefitPlanValue === 'string') {
+      try {
+        const parsed = JSON.parse(benefitPlanValue);
+        if (typeof parsed === 'string') {
+          try {
+            const nestedParsed = JSON.parse(parsed);
+            return nestedParsed?.id || nestedParsed?.uuid || parsed;
+          } catch (e) {
+            return parsed;
+          }
+        }
+        return parsed?.id || parsed?.uuid || benefitPlanValue;
+      } catch (e) {
+        return benefitPlanValue;
+      }
+    }
+
+    return null;
+  }
+
   render() {
     const {
       edited, classes, intl, readOnly, isPayrollFromFailedInvoices, benefitPlanId,
@@ -33,10 +60,7 @@ class PayrollHeadPanel extends FormPanel {
 
     let effectiveBenefitPlanId = benefitPlanId;
     if (!effectiveBenefitPlanId && payroll?.paymentPlan?.benefitPlan) {
-      const benefitPlan = JSON.parse(payroll.paymentPlan.benefitPlan);
-      if (benefitPlan) {
-        effectiveBenefitPlanId = JSON.parse(benefitPlan)?.id;
-      }
+      effectiveBenefitPlanId = this.resolveBenefitPlanId(payroll.paymentPlan.benefitPlan);
     }
     return (
       <>

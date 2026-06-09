@@ -23,6 +23,35 @@ import {
 import { mutationLabel, pageTitle } from '../../utils/string-utils';
 import { fetchPayrolls, deletePayrolls } from '../../actions';
 
+const resolveBenefitPlan = (payroll) => {
+  if (payroll?.benefitPlan) {
+    return payroll.benefitPlan;
+  }
+
+  const benefitPlanValue = payroll?.paymentPlan?.benefitPlan;
+  if (!benefitPlanValue) {
+    return null;
+  }
+
+  if (typeof benefitPlanValue === 'object') {
+    return benefitPlanValue;
+  }
+
+  if (typeof benefitPlanValue === 'string') {
+    try {
+      const parsed = JSON.parse(benefitPlanValue);
+      if (typeof parsed === 'string') {
+        return JSON.parse(parsed);
+      }
+      return parsed;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  return null;
+};
+
 function PayrollSearcher({
   deletePayrolls,
   fetchingPayrolls,
@@ -116,8 +145,10 @@ function PayrollSearcher({
 
   const itemFormatters = () => [
     (payroll) => payroll.name,
-    (payroll) => (payroll.benefitPlan
-      ? `${payroll.benefitPlan.code} ${payroll.benefitPlan.name}` : ''),
+    (payroll) => {
+      const benefitPlan = resolveBenefitPlan(payroll);
+      return benefitPlan ? `${benefitPlan.code} ${benefitPlan.name}` : '';
+    },
     (payroll) => (payroll.paymentPoint
       ? `${payroll.paymentPoint.name}` : ''),
     (payroll) => (payroll.status

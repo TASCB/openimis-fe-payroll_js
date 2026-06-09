@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid } from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
 import { injectIntl } from 'react-intl';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -8,16 +8,27 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import {
   formatMessage,
-  renderInputComponent,
-  createFieldsBasedOnJSON,
 } from '@openimis/fe-core';
 import { withTheme, withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { MODULE_NAME } from '../../../constants';
 
 const styles = (theme) => ({
   item: theme.paper.item,
+  valueRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: theme.spacing(1, 0),
+    borderBottom: '1px solid #d8e4e6',
+  },
+  valueLabel: {
+    fontWeight: 600,
+    marginRight: theme.spacing(2),
+    textTransform: 'capitalize',
+  },
+  valueContent: {
+    textAlign: 'right',
+  },
 });
 
 function AdditionalFieldsDialog({
@@ -27,8 +38,6 @@ function AdditionalFieldsDialog({
   buttonLabel,
   title,
 }) {
-  // eslint-disable-next-line no-param-reassign
-  if (!jsonExt) jsonExt = '{}';
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
@@ -38,7 +47,56 @@ function AdditionalFieldsDialog({
   const handleClose = () => {
     setIsOpen(false);
   };
-  const jsonExtFields = createFieldsBasedOnJSON(JSON.stringify(JSON.parse(jsonExt).extra_info));
+
+  const parseJsonExt = () => {
+    if (!jsonExt) return {};
+    if (typeof jsonExt === 'string') {
+      try {
+        return JSON.parse(jsonExt);
+      } catch (e) {
+        return {};
+      }
+    }
+    return jsonExt;
+  };
+
+  const buildDisplayPayload = (parsedJsonExt) => {
+    if (parsedJsonExt?.extra_info && Object.keys(parsedJsonExt.extra_info).length > 0) {
+      return parsedJsonExt.extra_info;
+    }
+
+    if (parsedJsonExt?.pct_breakdown) {
+      const breakdown = parsedJsonExt.pct_breakdown;
+      return {
+        base_amount: breakdown.base_amount,
+        has_disability: breakdown.has_disability,
+        disability_amount: breakdown.disability_amount,
+        young_child_count: breakdown.young_child_count,
+        young_child_amount: breakdown.young_child_amount,
+        primary_count: breakdown.primary_count,
+        primary_amount: breakdown.primary_amount,
+        secondary_count: breakdown.secondary_count,
+        secondary_amount: breakdown.secondary_amount,
+        capped_total: breakdown.capped_total,
+      };
+    }
+
+    return parsedJsonExt;
+  };
+
+  const parsedJsonExt = parseJsonExt();
+  const displayPayload = buildDisplayPayload(parsedJsonExt);
+  const entries = Object.entries(displayPayload || {}).filter(([, value]) => value !== undefined && value !== null);
+
+  const formatLabel = (key) => {
+    if (key === 'base_amount') {
+      return 'Direct Support';
+    }
+
+    return key
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (match) => match.toUpperCase());
+  };
 
   return (
     <>
@@ -78,9 +136,19 @@ function AdditionalFieldsDialog({
               style={{ backgroundColor: '#DFEDEF', paddingLeft: '10px', paddingBottom: '10px' }}
             >
               <Grid container className={classes.item}>
-                {jsonExtFields?.map((jsonExtField) => (
-                  <Grid item xs={6} className={classes.item}>
-                    {renderInputComponent(MODULE_NAME, jsonExtField)}
+                {entries.length === 0 && (
+                  <Grid item xs={12} className={classes.item}>
+                    <Typography>No additional breakdown available.</Typography>
+                  </Grid>
+                )}
+                {entries.map(([key, value]) => (
+                  <Grid item xs={12} className={classes.item} key={key}>
+                    <div className={classes.valueRow}>
+                      <Typography className={classes.valueLabel}>{formatLabel(key)}</Typography>
+                      <Typography className={classes.valueContent}>
+                        {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}
+                      </Typography>
+                    </div>
                   </Grid>
                 ))}
               </Grid>

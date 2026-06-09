@@ -23,6 +23,8 @@ import {
 import { mutationLabel } from '../../../utils/string-utils';
 import BenefitConsumptionSearcherModal from '../BenefitConsumptionSearcherModal';
 import downloadPayroll from '../../../utils/export';
+import { exportPaymentSlipsPdf } from '../../../utils/payment-documents/exportPaymentDocuments';
+import { buildPaymentSlipsPayloads, resolveProgramName } from '../../../utils/payment-documents/payrollPayloadBuilders';
 
 function PaymentApproveForPaymentDialog({
   classes,
@@ -117,6 +119,16 @@ function PaymentApproveForPaymentDialog({
 
   const downloadPayrollData = (payrollUuid, payrollName) => {
     downloadPayroll(payrollUuid, payrollName);
+  };
+
+  const exportPaymentSlipsPdfCallback = () => {
+    const sourcePayroll = payroll && Object.keys(payroll).length > 0 ? payroll : payrollDetail;
+    const payloads = buildPaymentSlipsPayloads(sourcePayroll);
+    if (payloads.length === 0) return;
+    const program = (resolveProgramName(sourcePayroll) || 'Program').replace(/[^a-z0-9_-]+/gi, '_');
+    exportPaymentSlipsPdf(payloads, {
+      fileName: `${program}_Payment_Slips_${(sourcePayroll?.name || 'payroll').replace(/[^a-z0-9_-]+/gi, '_')}.pdf`,
+    });
   };
 
   return (
@@ -226,6 +238,20 @@ function PaymentApproveForPaymentDialog({
                 }}
               >
                 {formatMessage('payroll.summary.download')}
+              </Button>
+              {/* Paylist PDF export moved to the TASAF Paylists tab — the MUSE
+                  dispatch paylist is a TASAF artifact, not a generic payroll one. */}
+              <Button
+                onClick={exportPaymentSlipsPdfCallback}
+                variant="contained"
+                color="primary"
+                disabled={totalBeneficiaries === 0}
+                style={{
+                  margin: '0 16px',
+                  marginBottom: '15px',
+                }}
+              >
+                {formatMessage('payroll.summary.exportSlipsPdf')}
               </Button>
               <Button
                 onClick={() => rejectPayrollCallback(payrollDetail)}

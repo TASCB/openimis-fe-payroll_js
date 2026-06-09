@@ -41,6 +41,16 @@ import {
 import { PayrollDeleteTaskItemFormatters, PayrollDeleteTaskTableHeaders } from './components/tasks/PayrollDeleteTasks';
 import { PayrollPaymentFilesTabLabel, PayrollPaymentFilesTabPanel } from './components/payroll/PayrollPaymentFilesTab';
 import PendingPayrollsPage from './pages/payroll/PendingPayrollsPage';
+import {
+  demoPaylistPayload,
+  demoPaymentSlipPayload,
+  exportPaylistPdf,
+  exportPaymentSlipPdf,
+} from './utils/payment-documents/exportPaymentDocuments';
+// Re-exported so the TASAF payment module can produce the MUSE dispatch
+// Paylist PDF from its own Paylists surface (the paylist artifact belongs there,
+// not on the generic approve-for-payment dialog).
+import { buildPaylistPayload } from './utils/payment-documents/payrollPayloadBuilders';
 
 const ROUTE_PAYMENT_POINTS = 'paymentPoints';
 const ROUTE_PAYMENT_POINT = 'paymentPoints/paymentPoint';
@@ -144,3 +154,11 @@ const DEFAULT_CONFIG = {
 };
 
 export const PayrollModule = (cfg) => ({ ...DEFAULT_CONFIG, ...cfg });
+
+export {
+  demoPaylistPayload,
+  demoPaymentSlipPayload,
+  exportPaylistPdf,
+  exportPaymentSlipPdf,
+  buildPaylistPayload,
+};

@@ -106,6 +106,8 @@
   "payroll.summary.approveAndClose": "Approve and Close",
   "payroll.summary.createPaymentForFailedInvoice": "Create Payment For Failed Invoice",
   "payroll.summary.download": "Download",
+  "payroll.summary.exportPaylistPdf": "Export Paylist (PDF)",
+  "payroll.summary.exportSlipsPdf": "Export All Slips (PDF)",
   "payroll.summary.reject": "Reject",
   "payroll.summary.close": "Close",
   "payroll.summary.payedOnTime": "Payed On Time",
