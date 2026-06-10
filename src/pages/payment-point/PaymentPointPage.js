@@ -31,7 +31,7 @@ import PaymentPointHeadPanel from './PaymentPointHeadPanel';
 
 const useStyles = makeStyles((theme) => ({
   page: theme.page,
-  lockedPage: theme.page.locked,
+  lockedPage: theme.page?.locked ?? {},
 }));
 
 function PaymentPointPage({

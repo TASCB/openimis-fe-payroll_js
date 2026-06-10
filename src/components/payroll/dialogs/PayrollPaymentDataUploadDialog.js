@@ -16,7 +16,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 const styles = (theme) => ({
-  item: theme.paper.item,
+  item: theme.paper?.item ?? {},
 });
 
 function PayrollPaymentDataUploadDialog({

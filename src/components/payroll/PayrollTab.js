@@ -19,8 +19,8 @@ import PayrollPaymentDataUploadDialog from './dialogs/PayrollPaymentDataUploadDi
 import downloadPayroll from '../../utils/export';
 
 const useStyles = makeStyles((theme) => ({
-  paper: theme.paper.paper,
-  tableTitle: theme.table.title,
+  paper: theme.paper?.paper ?? {},
+  tableTitle: theme.table?.title ?? {},
   tabs: {
     display: 'flex',
     alignItems: 'center',

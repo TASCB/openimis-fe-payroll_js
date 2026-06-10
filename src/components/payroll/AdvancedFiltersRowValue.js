@@ -25,7 +25,7 @@ import {
 } from '../../constants';
 
 const styles = (theme) => ({
-  item: theme.paper.item,
+  item: theme.paper?.item ?? {},
 });
 
 function AdvancedFiltersRowValue({

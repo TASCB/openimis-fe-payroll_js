@@ -18,7 +18,7 @@ import { BENEFIT_PLAN } from '../../constants';
 import { isBase64Encoded } from '../../utils/advanced-filters-utils';
 
 const styles = (theme) => ({
-  item: theme.paper.item,
+  item: theme.paper?.item ?? {},
   section: {
     paddingLeft: '10px',
   },
