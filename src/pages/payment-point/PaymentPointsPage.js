@@ -48,7 +48,7 @@ function PaymentPointsPage() {
               <AddIcon />
             </Fab>
           </div>,
-          formatMessage('tooltip.createButton'),
+          formatMessage('createButton.tooltip'),
         )}
     </div>
   );
