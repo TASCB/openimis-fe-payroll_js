@@ -66,7 +66,6 @@ function PaymentPointSearcher({
     if (paymentPointToDelete && confirmed !== null) {
       setPaymentPointToDelete(null);
     }
-    return () => confirmed && clearConfirm(false);
   }, [confirmed]);
 
   useEffect(() => {
